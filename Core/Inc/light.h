@@ -17,6 +17,7 @@
 
 
 void lightTraffic1 (int state);
-
+void lightTraffic2 (int state);
+void Test();
 
 #endif /* INC_LIGHT_H_ */

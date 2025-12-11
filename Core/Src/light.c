@@ -26,3 +26,25 @@ void lightTraffic1(int state){
 	}
 }
 
+void lightTraffic2(int state){
+	if (state == OFF){
+		HAL_GPIO_WritePin(D3_GPIO_Port, D3_Pin, RESET);
+		HAL_GPIO_WritePin(D4_GPIO_Port, D4_Pin, RESET);
+	}
+	if (state == RED){
+		HAL_GPIO_WritePin(D3_GPIO_Port, D3_Pin, SET);
+		HAL_GPIO_WritePin(D4_GPIO_Port, D4_Pin, SET);
+	}
+	if (state == YELLOW){
+		HAL_GPIO_WritePin(D3_GPIO_Port, D3_Pin, RESET);
+		HAL_GPIO_WritePin(D4_GPIO_Port, D4_Pin, SET);
+	}
+	if (state == GREEN){
+		HAL_GPIO_WritePin(D3_GPIO_Port, D3_Pin, SET);
+		HAL_GPIO_WritePin(D4_GPIO_Port, D4_Pin, RESET);
+	}
+}
+void Test(){
+	lightTraffic1(3);
+}
+

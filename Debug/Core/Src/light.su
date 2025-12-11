@@ -1,1 +1,3 @@
 light.c:10:6:lightTraffic1	16	static
+light.c:29:6:lightTraffic2	16	static
+light.c:47:6:Test	8	static
