@@ -145,18 +145,7 @@ int main(void)
 
   while (1)
   {
-	  //SCH_Dispatch_Tasks();
-//	  if (isButton3Pressed()) {
-//		  HAL_GPIO_TogglePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin);
-//	  }
-	  lightTraffic2(RED);
-	  HAL_Delay(1000);
-	  lightTraffic2(YELLOW);
-	  HAL_Delay(1000);
-	  lightTraffic2(GREEN);
-	  HAL_Delay(1000);
-
-
+	  SCH_Dispatch_Tasks();
 
     /* USER CODE END WHILE */
 
