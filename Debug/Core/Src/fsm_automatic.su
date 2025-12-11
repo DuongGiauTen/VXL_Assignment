@@ -1,0 +1,2 @@
+fsm_automatic.c:18:6:update_time_counter	4	static
+fsm_automatic.c:24:6:fsm_automatic_run	32	static

@@ -22,16 +22,21 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include "scheduler.h"
+#include "global.h"
 #include "button.h"
 #include "light.h"
 #include "i2c-lcd.h"
+#include "fsm_automatic.h"
+#include "fsm_manual.h"
+#include "software_timer.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-void timer_isr(){
-	getKeyInput();
-}
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -48,8 +53,6 @@ I2C_HandleTypeDef hi2c1;
 
 TIM_HandleTypeDef htim2;
 
-UART_HandleTypeDef huart2;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -57,7 +60,6 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_USART2_UART_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
@@ -97,11 +99,41 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART2_UART_Init();
   MX_TIM2_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim2); // Bắt đầu Timer 2 ở chế độ ngắt
+  // Initial LCD
+    setTimer(1,100);
+
+    lcd_init();
+    lcd_send_string("TRAFFIC LIGHT");
+    //setTimer(0,5000); // Ch�? 1 chút cho ngầu
+    lcd_clear_display();
+
+    //Init Scheduler
+    SCH_Init();
+
+    //Add Task
+    // 4. Thêm các tác vụ vào Scheduler (Tick cơ sở là 10ms)
+
+      // Task 1: Máy trạng thái Tự động (Chạy liên tục để kiểm tra chuyển màu)
+      // Delay: 0, Chu kỳ: 1 tick (10ms)
+      SCH_Add_Task(fsm_automatic_run, 0, 10);
+
+      // Task 2: Máy trạng thái Thủ công (Chạy liên tục để check nút nhấn chuyển chế độ)
+      // Delay: 0, Chu kỳ: 1 tick (10ms)
+      SCH_Add_Task(fsm_manual_run, 0, 10);
+
+      // Task 3: Giảm biến đếm th�?i gian (Countdown)
+      // Biến đếm cần giảm mỗi 1 giây (1000ms). Vì tick = 10ms -> Chu kỳ = 100 ticks.
+      // Hàm update_time_counter nằm trong fsm_automatic.c
+      SCH_Add_Task(update_time_counter, 0, 100);
+
+      // Task 4: Nhấp nháy đèn khi cài đặt (Blink LED)
+      // Nháy mỗi 500ms (0.5s). Chu kỳ = 50 ticks.
+      // Hàm toggle_blink nằm trong fsm_manual.c
+      SCH_Add_Task(toggle_blink, 0, 10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -110,26 +142,20 @@ int main(void)
 
 
 
-  lcd_init();
-  lcd_send_string("DuongDepTrai");
-  uint8_t counter = 0;
 
   while (1)
   {
-
-
-	  if(isButton1Pressed()){ //nut nhan thu nhat
-		  HAL_GPIO_TogglePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin);
-		  lightTraffic1(counter++); // code dieu khien module den thu nhat
-
-	  }
-	  if (counter >= 4){
-		  counter = 1;
-	  }
-
-//	  if(isButton1LongPressed()){
-//	  		  HAL_GPIO_TogglePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin);
+	  //SCH_Dispatch_Tasks();
+//	  if (isButton3Pressed()) {
+//		  HAL_GPIO_TogglePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin);
 //	  }
+	  lightTraffic2(RED);
+	  HAL_Delay(1000);
+	  lightTraffic2(YELLOW);
+	  HAL_Delay(1000);
+	  lightTraffic2(GREEN);
+	  HAL_Delay(1000);
+
 
 
     /* USER CODE END WHILE */
@@ -254,39 +280,6 @@ static void MX_TIM2_Init(void)
 }
 
 /**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
-
-}
-
-/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -302,7 +295,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GREEN_LED_Pin|D3_Pin|D4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, D2_Pin|D1_Pin, GPIO_PIN_RESET);
@@ -313,15 +306,21 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : BUTTON_Pin */
   GPIO_InitStruct.Pin = BUTTON_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(BUTTON_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : GREEN_LED_Pin */
-  GPIO_InitStruct.Pin = GREEN_LED_Pin;
+  /*Configure GPIO pins : BUTTON1_Pin BUTTON2_Pin */
+  GPIO_InitStruct.Pin = BUTTON1_Pin|BUTTON2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : GREEN_LED_Pin D3_Pin D4_Pin */
+  GPIO_InitStruct.Pin = GREEN_LED_Pin|D3_Pin|D4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GREEN_LED_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : D2_Pin D1_Pin */
   GPIO_InitStruct.Pin = D2_Pin|D1_Pin;
@@ -337,20 +336,22 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BUTTON2_Pin */
-  GPIO_InitStruct.Pin = BUTTON2_Pin;
+  /*Configure GPIO pins : BUTTON3_Pin BUTTON4_Pin */
+  GPIO_InitStruct.Pin = BUTTON3_Pin|BUTTON4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(BUTTON2_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
-// Hàm callback được g�?i khi ngắt timer xảy ra
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if(htim->Instance == TIM2) {
-    timer_isr(); // G�?i hàm quét nút nhấn
+	getKeyInput();
+    SCH_Update();
+    timerRun();
   }
 }
 /* USER CODE END 4 */
