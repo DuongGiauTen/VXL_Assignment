@@ -22,6 +22,11 @@
 #define MAN_YELLOW_CONFIG 12
 #define MAN_GREEN_CONFIG  13
 
+#define RED_GREEN_MOD  14
+#define RED_YELLOW_MOD  15
+#define GREEN_RED_MOD   16
+#define YELLOW_RED_MOD  17
+
 // Các biến toàn cục
 extern int status;
 extern int time_red;
@@ -32,5 +37,6 @@ extern int time_yellow;
 extern int time_counter_red;
 extern int time_counter_green;
 extern int time_counter_yellow;
+extern int counter_modify;
 
 #endif /* INC_GLOBAL_H_ */

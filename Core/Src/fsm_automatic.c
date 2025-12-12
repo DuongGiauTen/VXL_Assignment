@@ -7,12 +7,12 @@
 
 /* fsm_automatic.c */
 #include "fsm_automatic.h"
-#include "main.h" // Để dùng HAL_GPIO
-#include "light.h" // Giả sử bạn sẽ viết hàm điều khiển đèn module 2 ở đây
+#include "main.h"
+#include "light.h"
 #include "i2c-lcd.h"
-#include <stdio.h> // Để dùng sprintf
+#include <stdio.h>
 
-// Hàm điều khiển đèn Module 2 (Bạn nên chuyển vào light.c sau này)
+
 
 
 void update_time_counter() {
@@ -42,12 +42,6 @@ void fsm_automatic_run() {
             lightTraffic1(RED);
             lightTraffic2(GREEN);
 
-            // Hiển thị LCD
-            // Dòng 1: Thời gian còn lại của Đỏ 1
-            // Dòng 2: Thời gian còn lại của Xanh 2
-            // Lưu ý: time_counter_red đếm từ 5 về 0. time_counter_green đếm từ 3 về 0.
-            // Cần logic hiển thị đúng. Thường hiển thị time_counter_red cho đèn 1, và time_counter_green cho đèn 2.
-
             lcd_goto_XY(1, 0);
             sprintf(buffer, "WAY1: RED: %02d   ", time_counter_red);
             lcd_send_string(buffer);
@@ -62,7 +56,6 @@ void fsm_automatic_run() {
             if (time_counter_green <= 0) {
                 status = RED_YELLOW;
                 time_counter_green = time_red; // Reset cho vòng sau
-                // time_counter_red vẫn tiếp tục đếm
                 time_counter_yellow = time_yellow;
             }
             break;
@@ -72,11 +65,11 @@ void fsm_automatic_run() {
             lightTraffic2(YELLOW);
 
             lcd_goto_XY(1, 0);
-            sprintf(buffer, "WAY1: RED1: %02d   ", time_counter_red);
+            sprintf(buffer, "WAY1: RED: %02d   ", time_counter_red);
             lcd_send_string(buffer);
 
             lcd_goto_XY(2, 0);
-            sprintf(buffer, "WAY2: YEL2: %02d   ", time_counter_yellow);
+            sprintf(buffer, "WAY2: YEL: %02d   ", time_counter_yellow);
             lcd_send_string(buffer);
 
             // Chuyển trạng thái khi Đèn 2 hết Vàng (2s) -> Cả 2 đổi màu
@@ -92,11 +85,11 @@ void fsm_automatic_run() {
             lightTraffic2(RED);
 
             lcd_goto_XY(1, 0);
-            sprintf(buffer, "WAY1: GRN1: %02d   ", time_counter_green);
+            sprintf(buffer, "WAY1: GRN: %02d   ", time_counter_green);
             lcd_send_string(buffer);
 
             lcd_goto_XY(2, 0);
-            sprintf(buffer, "WAY2: RED2: %02d   ", time_counter_red);
+            sprintf(buffer, "WAY2: RED: %02d   ", time_counter_red);
             lcd_send_string(buffer);
 
             if (time_counter_green <= 0) {
@@ -111,11 +104,11 @@ void fsm_automatic_run() {
             lightTraffic2(RED);
 
             lcd_goto_XY(1, 0);
-            sprintf(buffer, "WAY1: YEL1: %02d   ", time_counter_yellow);
+            sprintf(buffer, "WAY1: YEL: %02d   ", time_counter_yellow);
             lcd_send_string(buffer);
 
             lcd_goto_XY(2, 0);
-            sprintf(buffer, "WAY2: RED2: %02d   ", time_counter_red);
+            sprintf(buffer, "WAY2: RED: %02d   ", time_counter_red);
             lcd_send_string(buffer);
 
             if (time_counter_yellow <= 0) {

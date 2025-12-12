@@ -16,6 +16,7 @@ void fsm_manual_run() {
 
     // --- XỬ LÝ CHUYỂN CHẾ ĐỘ & NẠP GIÁ TRỊ TẠM ---
     if (isButton1Pressed()) {
+
         switch (status) {
             case RED_GREEN:
             case RED_YELLOW:
@@ -70,6 +71,7 @@ void fsm_manual_run() {
             if (isButton4Pressed()) {
                 temp_val--;
                 if (temp_val > 99) temp_val = 1;
+                if (temp_val < 0) temp_val = 99;
             }
 
             // 4. Lưu giá trị thật (Button 3)
@@ -112,6 +114,7 @@ void fsm_manual_run() {
             if (isButton4Pressed()) {
                 temp_val--;
                 if (temp_val > 99) temp_val = 1;
+                if (temp_val < 0) temp_val = 99;
             }
 
             if (isButton3Pressed()) {
@@ -120,7 +123,10 @@ void fsm_manual_run() {
                 // Đỏ = Xanh + Vàng (Thay đổi Vàng -> Cập nhật Đỏ, giữ Xanh)
                 time_red = time_green + time_yellow;
                 // Nếu vượt quá 99 thì xử lý giới hạn (tùy chọn)
-                if(time_red > 99) time_red = 99;
+                if(time_red > 99){
+                	time_red = 99;
+                	time_yellow = time_red - time_green;
+                }
 
                 lcd_goto_XY(1, 0);
                 lcd_send_string("    CONFIRMED   ");
@@ -145,6 +151,7 @@ void fsm_manual_run() {
             if (isButton4Pressed()) {
                 temp_val--;
                 if (temp_val > 99) temp_val = 1;
+                if (temp_val < 0) temp_val = 99;
             }
 
             if (isButton3Pressed()) {
@@ -152,7 +159,10 @@ void fsm_manual_run() {
 
                 // Đỏ = Xanh + Vàng (Thay đổi Xanh -> Cập nhật Đỏ, giữ Vàng)
                 time_red = time_green + time_yellow;
-                if(time_red > 99) time_red = 99;
+                if(time_red > 99){
+                	time_red = 99;
+                	time_yellow = time_red - time_green;
+                }
 
                 lcd_goto_XY(1, 0);
                 lcd_send_string("    CONFIRMED   ");

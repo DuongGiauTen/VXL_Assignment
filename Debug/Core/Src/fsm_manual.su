@@ -1,2 +1,2 @@
 fsm_manual.c:14:6:fsm_manual_run	32	static
-fsm_manual.c:167:6:toggle_blink	4	static
+fsm_manual.c:177:6:toggle_blink	4	static

@@ -30,6 +30,7 @@
 #include "i2c-lcd.h"
 #include "fsm_automatic.h"
 #include "fsm_manual.h"
+#include "fsm_modify.h"
 #include "software_timer.h"
 
 /* USER CODE END Includes */
@@ -134,6 +135,8 @@ int main(void)
       // Nháy mỗi 500ms (0.5s). Chu kỳ = 50 ticks.
       // Hàm toggle_blink nằm trong fsm_manual.c
       SCH_Add_Task(toggle_blink, 0, 10);
+
+      SCH_Add_Task(fsm_modify,0,10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
