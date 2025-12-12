@@ -66,6 +66,7 @@ void lcd_send_string (char *str)
 void lcd_clear_display (void)
 {
 	lcd_send_cmd (0x01); //clear display
+	HAL_Delay(10);
 }
 
 void lcd_goto_XY (int row, int col)
