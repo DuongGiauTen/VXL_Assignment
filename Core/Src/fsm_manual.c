@@ -67,6 +67,10 @@ void fsm_manual_run() {
                 temp_val++;
                 if (temp_val > 99) temp_val = 1;
             }
+            if (isButton4Pressed()) {
+                temp_val--;
+                if (temp_val > 99) temp_val = 1;
+            }
 
             // 4. Lưu giá trị thật (Button 3)
             if (isButton3Pressed()) {
@@ -105,6 +109,11 @@ void fsm_manual_run() {
                 if (temp_val > 99) temp_val = 1;
             }
 
+            if (isButton4Pressed()) {
+                temp_val--;
+                if (temp_val > 99) temp_val = 1;
+            }
+
             if (isButton3Pressed()) {
                 time_yellow = temp_val; // Gán chính thức
 
@@ -131,6 +140,10 @@ void fsm_manual_run() {
 
             if (isButton2Pressed()) {
                 temp_val++;
+                if (temp_val > 99) temp_val = 1;
+            }
+            if (isButton4Pressed()) {
+                temp_val--;
                 if (temp_val > 99) temp_val = 1;
             }
 
